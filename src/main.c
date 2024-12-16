@@ -6,32 +6,37 @@
 /*   By: jopereir <jopereir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 11:20:22 by jopereir          #+#    #+#             */
-/*   Updated: 2024/12/15 14:20:00 by jopereir         ###   ########.fr       */
+/*   Updated: 2024/12/16 14:42:45 by jopereir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	set_null(t_params *params)
+int	main(int argc, char *argv[], char **env)
 {
-	params->infile = NULL;
-	params->outfile = NULL;
-	params->cmd1 = NULL;
-	params->cmd2 = NULL;
-	params->in_fd = 0;
-	params->out_fd = 0;
-	params->pipe_fd[0] = 0;
-	params->pipe_fd[1] = 0;
-}
+	pid_t	pid;
+	pid_t	pid_parent;
+	int		fd[2];
+	int		exit_code;	
 
-int	main(int argc, char *argv[])
-{
-	t_params	params;
-
-	set_null(&params);
 	if (argc != 5)
-		destroy(&params,
-			"Error: Too few arguments.\n./pipex infile cm1 cm2 outfile", 1);
-	create(&params, argv);
-	return (0);
+		exit(ft_printf("Error: Too few arguments.\n"));
+	exit_code = 0;
+	if (pipe(fd) < 0)
+		exit(ft_printf("Error: Pipe failed\n"));
+	pid = fork();
+	if (pid < 0)
+		exit(ft_printf("Error: Fork failed."));
+	if (pid == 0)
+		child(argv, env, fd);
+	pid_parent = fork();
+	if (pid_parent < 0)
+		exit(ft_printf("Error: Fork failed"));
+	if (pid_parent == 0)
+		parent(argv, env, fd);
+	close (fd[0]);
+	close (fd[1]);
+	waitpid(pid, NULL, 0);
+	waitpid(pid_parent, &exit_code, 0);
+	return (exit_code);
 }

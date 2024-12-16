@@ -6,14 +6,14 @@
 #    By: jopereir <jopereir@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/18 11:11:14 by jopereir          #+#    #+#              #
-#    Updated: 2024/12/15 12:30:49 by jopereir         ###   ########.fr        #
+#    Updated: 2024/12/16 13:23:12 by jopereir         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 
 SRC_DIR = src
-SRCS = events.c init.c validation.c
+SRCS = pipex.c
 
 SRC = $(addprefix $(SRC_DIR)/, $(SRCS))
 OBJ = $(SRC:.c=.o)
