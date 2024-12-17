@@ -6,7 +6,7 @@
 /*   By: jopereir <jopereir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 10:53:10 by jopereir          #+#    #+#             */
-/*   Updated: 2024/12/17 13:03:00 by jopereir         ###   ########.fr       */
+/*   Updated: 2024/12/17 14:06:36 by jopereir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,8 @@ static	char	*find_path(char *cmd, char **env)
 	i = 0;
 	while (paths[i])
 	{
-		temp_path = ft_strjoin(paths[i], "/");
-		path = ft_strjoin(temp_path, cmd);
-		free(temp_path);
-		if (access(path, F_OK) == 0)
+		path = ft_strjoin(ft_strjoin(paths[i], "/"), cmd);
+		if (access(path, F_OK | X_OK) == 0)
 		{
 			free_cmd(paths);
 			return (path);

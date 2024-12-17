@@ -6,7 +6,7 @@
 #    By: jopereir <jopereir@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/18 11:11:14 by jopereir          #+#    #+#              #
-#    Updated: 2024/12/16 13:23:12 by jopereir         ###   ########.fr        #
+#    Updated: 2024/12/17 14:05:51 by jopereir         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ $(LIBFT)/libft.a:
 #Creates libft.a. Copy to the current directory. Add libft.a to libprintf.a
 $(NAME): $(OBJ) $(LIBFT)/libft.a
 	@echo "Compiling main.c"
-	@$(CC) $(CFLAGS) $(SRC_DIR)/main.c $(OBJ) $(LIBFT)/libft.a -lmlx -lX11 -lXext -lm -o $(NAME)
+	@$(CC) $(CFLAGS) $(SRC_DIR)/main.c $(OBJ) $(LIBFT)/libft.a -o $(NAME)
 
 clean:
 	@echo "Objects removed."
