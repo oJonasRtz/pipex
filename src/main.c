@@ -6,45 +6,43 @@
 /*   By: jopereir <jopereir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 11:20:22 by jopereir          #+#    #+#             */
-/*   Updated: 2024/12/17 11:38:29 by jopereir         ###   ########.fr       */
+/*   Updated: 2024/12/17 12:57:18 by jopereir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	close_fd(int *fd, char *message)
+int	close_fd(t_pipex *pipex, char *message, int exit)
 {
-	close(fd[0]);
-	close(fd[1]);
+	close(pipex->fd[0]);
+	close(pipex->fd[1]);
 	if (message)
 		ft_printf("%s\n", message);
-	return (1);
+	return (exit);
 }
 
 int	main(int argc, char *argv[], char **env)
 {
-	pid_t	pid;
-	pid_t	pid_parent;
-	int		fd[2];
-	int		exit_code;	
+	int		exit_code;
+	t_pipex	pipex;
 
 	if (argc != 5)
 		exit (ft_printf("Error: Too few arguments.\n"));
 	exit_code = 0;
-	if (pipe(fd) < 0)
-		exit(close_fd(fd, "Error: Pipe failed"));
-	pid = fork();
-	if (pid < 0)
-		exit(close_fd(fd, "Error: Fork failed."));
-	if (pid == 0)
-		child(argv, env, fd);
-	pid_parent = fork();
-	if (pid_parent < 0)
-		exit(close_fd(fd, "Error: Fork failed"));
-	if (pid_parent == 0)
-		parent(argv, env, fd);
-	close_fd(fd, NULL);
-	waitpid(pid, NULL, 0);
-	waitpid(pid_parent, &exit_code, 0);
+	if (pipe(pipex.fd) < 0)
+		exit(close_fd(&pipex, NULL, 1));
+	pipex.pid = fork();
+	if (pipex.pid < 0)
+		exit(close_fd(&pipex, NULL, 1));
+	if (pipex.pid == 0)
+		child(argv, env, &pipex);
+	pipex.pid_parent = fork();
+	if (pipex.pid_parent < 0)
+		exit(close_fd(&pipex, NULL, 1));
+	if (pipex.pid_parent == 0)
+		parent(argv, env, &pipex);
+	close_fd(&pipex, NULL, 0);
+	waitpid(pipex.pid, &exit_code, 0);
+	waitpid(pipex.pid_parent, &exit_code, 0);
 	return (exit_code);
 }
