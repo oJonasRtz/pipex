@@ -6,7 +6,7 @@
 /*   By: jopereir <jopereir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 10:53:10 by jopereir          #+#    #+#             */
-/*   Updated: 2024/12/16 14:34:17 by jopereir         ###   ########.fr       */
+/*   Updated: 2024/12/17 11:48:55 by jopereir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,10 +64,10 @@ static void	execute_process(char *argv, char **env)
 	if (!path)
 	{
 		free_cmd(cmd);
-		exit (ft_printf("Error: Path failed.\n"));
+		return ;
 	}
 	if (execve(path, cmd, env) == -1)
-		exit (ft_printf("Error: Excve failed.\n"));
+		exit (1);
 }
 
 void	child(char **argv, char **env, int *pipe_fd)
@@ -77,9 +77,13 @@ void	child(char **argv, char **env, int *pipe_fd)
 	in_fd = open(argv[1], O_RDONLY, 0777);
 	if (in_fd < 0)
 		exit (ft_printf("Error: Couldn't open infile.\n"));
-	dup2(pipe_fd[1], STDOUT_FILENO);
-	dup2(in_fd, STDIN_FILENO);
-	close(pipe_fd[0]);
+	if (dup2(pipe_fd[1], STDOUT_FILENO) < 0
+		|| dup2(in_fd, STDIN_FILENO) < 0)
+	{
+		close(in_fd);
+		exit(close_fd(pipe_fd, NULL));
+	}
+	close_fd(pipe_fd, NULL);
 	close(in_fd);
 	execute_process(argv[2], env);
 }
@@ -90,10 +94,14 @@ void	parent(char **argv, char **env, int *pipe_fd)
 
 	out_fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (out_fd < 0)
-		exit (ft_printf("Error: Coundn't open the outfile.\n"));
-	dup2(pipe_fd[0], STDIN_FILENO);
-	dup2(out_fd, STDOUT_FILENO);
-	close(pipe_fd[1]);
+		exit (close_fd(pipe_fd, "Error: Coundn't open the outfile.\n"));
+	if (dup2(pipe_fd[0], STDIN_FILENO) < 0
+		|| dup2(out_fd, STDOUT_FILENO) < 0)
+	{
+		close (out_fd);
+		exit(close_fd(pipe_fd, NULL));
+	}
+	close_fd(pipe_fd, NULL);
 	close(out_fd);
 	execute_process(argv[3], env);
 }
